@@ -15,9 +15,11 @@ router.get('/', (req,res) => {
 });
 
 router.post('/', (req,res) => {
+    console.log('you are in post');
     const { title, text } = req.body;
+    console.log(title, text);
     if(title && text) {
-        fs.readFile(path.join(__dirname,'..','..','..','db','db.join'), 'utf-8', (err, notes) => {
+        fs.readFile(path.join(__dirname,'..','..','..','db','db.json'), 'utf-8', (err, notes) => {
             //check for errors
             if(err) {
               return res.status(500).json({ err });
@@ -30,12 +32,12 @@ router.post('/', (req,res) => {
                 id: uuid()
             });
 
-            fs.writeFile('./db/users.json', JSON.stringify(data, null, 2), (err) => {
+            fs.writeFile(path.join(__dirname,'..','..','..','db','db.json'), JSON.stringify(data, null, 2), (err) => {
                 if(err) {
                     return res.status(500).json({err});
                 }
 
-                res.json({ title, text });
+                res.send({ title, text });
             });
 
         });  
@@ -46,30 +48,26 @@ router.post('/', (req,res) => {
 
 router.delete('/:id', (req, res) => {
     const deleteId = req.params.id;
-    if(title && text) {
-        fs.readFile(path.join(__dirname,'..','..','..','db','db.join'), 'utf-8', (err, notes) => {
+    if(deleteId) {
+        fs.readFile(path.join(__dirname,'..','..','..','db','db.json'), 'utf-8', (err, notes) => {
             //check for errors
             if(err) {
               return res.status(500).json({ err });
             }  
-            const data = JSON.parse(notes);
-             //add data to the array from db.json file
-            data.push({
-                title,
-                text,
-            });
-
-            fs.writeFile('./db/users.json', JSON.stringify(data, null, 2), (err) => {
+            let data = JSON.parse(notes);
+            data = data.filter(element => element.id !== deleteId)
+            
+            fs.writeFile(path.join(__dirname,'..','..','..','db','db.json'), JSON.stringify(data, null, 2), (err) => {
                 if(err) {
                     return res.status(500).json({err});
                 }
 
-                res.json({ title, text });
+                res.json(`Successfully deleted the note with id: ${deleteId}`);
             });
 
         });  
     }else {
-        res.status(400).json({error: 'Title and Text are required'});
+        res.status(400).json({error: 'Valid id is required!'});
     }    
 });
 

@@ -1,3 +1,5 @@
+console.log('you ere in js');
+
 let noteTitle;
 let noteText;
 let saveNoteBtn;
