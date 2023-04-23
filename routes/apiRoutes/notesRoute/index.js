@@ -3,21 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const uuid = require('../../../helpers/uuid');
 
+// get request for "http://localhost:3001/api/notes"
 router.get('/', (req,res) => {
     fs.readFile(path.join(__dirname,'..','..','..','db','db.json'), 'utf-8', (err, notes) => {
         if(err) {
-          console.log('i am in error');
           return res.status(500).json({ err });
         }  
-        console.log('i am not in error');
         res.json(JSON.parse(notes));
     });
 });
 
+// post request for "http://localhost:3001/api/notes"
 router.post('/', (req,res) => {
-    console.log('you are in post');
     const { title, text } = req.body;
-    console.log(title, text);
+
     if(title && text) {
         fs.readFile(path.join(__dirname,'..','..','..','db','db.json'), 'utf-8', (err, notes) => {
             //check for errors
@@ -46,6 +45,7 @@ router.post('/', (req,res) => {
     }
 });
 
+// delete request for "http://localhost:3001/api/notes/:id"
 router.delete('/:id', (req, res) => {
     const deleteId = req.params.id;
     if(deleteId) {
