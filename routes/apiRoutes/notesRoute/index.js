@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const uuid = require('../../../helpers/uuid');
 
-// get request for "http://localhost:3001/api/notes"
+// get request to route "http://localhost:3001/api/notes"
 router.get('/', (req,res) => {
     fs.readFile(path.join(__dirname,'..','..','..','db','db.json'), 'utf-8', (err, notes) => {
         if(err) {
@@ -13,7 +13,7 @@ router.get('/', (req,res) => {
     });
 });
 
-// post request for "http://localhost:3001/api/notes"
+// post request to route "http://localhost:3001/api/notes"
 router.post('/', (req,res) => {
     const { title, text } = req.body;
 
@@ -24,13 +24,14 @@ router.post('/', (req,res) => {
               return res.status(500).json({ err });
             }  
             const data = JSON.parse(notes);
-             //add data to the array from db.json file
+             //add note to the array from db.json file
             data.push({
                 title,
                 text,
                 id: uuid()
             });
 
+            // write the updated array to the db.json file
             fs.writeFile(path.join(__dirname,'..','..','..','db','db.json'), JSON.stringify(data, null, 2), (err) => {
                 if(err) {
                     return res.status(500).json({err});
@@ -45,7 +46,7 @@ router.post('/', (req,res) => {
     }
 });
 
-// delete request for "http://localhost:3001/api/notes/:id"
+// delete request to route "http://localhost:3001/api/notes/:id"
 router.delete('/:id', (req, res) => {
     const deleteId = req.params.id;
     if(deleteId) {
@@ -55,8 +56,10 @@ router.delete('/:id', (req, res) => {
               return res.status(500).json({ err });
             }  
             let data = JSON.parse(notes);
+            // filter the array without the note matching the delete request id
             data = data.filter(element => element.id !== deleteId)
             
+            // write the filtered array to the db.json file
             fs.writeFile(path.join(__dirname,'..','..','..','db','db.json'), JSON.stringify(data, null, 2), (err) => {
                 if(err) {
                     return res.status(500).json({err});
